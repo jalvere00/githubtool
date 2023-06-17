@@ -14,5 +14,6 @@ func main() {
 
 	fmt.Println("Args: ", argsWithProg)
 	fmt.Println("Flag: ", *nameFlag)
-	fmt.Println(getRepoRelease("lencx", "ChatGPT"))
+	fmt.Println(GetRepoRelease("lencx", "ChatGPT"))
+	fmt.Println(GetRepoPull("lencx", "ChatGPT"))
 }
