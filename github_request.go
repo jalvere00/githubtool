@@ -5,10 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 const (
-	base = "https://api.github.com/repos/"
+	base = "https://api.github.com/repos"
 )
 
 type Release struct {
@@ -17,12 +19,14 @@ type Release struct {
 	Date    string `json:"created_at"`
 }
 
+// Todo(jaalvere00): Rename struct
 type PullRequest struct {
 	Title  string `json:"title"`
 	Number int    `json:"number"`
 	State  string `json:"state"`
 }
 
+var maxResponse = flag.Int("max", 3, "The maximum number of reponses for any request.")
 var token = flag.String("token", "", "Using for Authentication of private repos.")
 var apiVersion = flag.String("api-version", "2022-11-28", "GitHub version your communicating with.")
 
@@ -67,9 +71,19 @@ func GetRepoPull(user, repository string) ([]PullRequest, error) {
 }
 
 func createGetRequest(user, repository, api string) (*http.Request, error) {
-	url := base + fmt.Sprintf("%s/%s/%s", user, repository, api)
+	endpoint := fmt.Sprintf("/%s/%s/%s", user, repository, api)
+	params := url.Values{}
+	params.Add("per_page", strconv.Itoa(*maxResponse))
 
-	request, err := http.NewRequest("GET", url, nil)
+	urlBuilder, err := url.Parse(base + endpoint)
+	if err != nil {
+		fmt.Println("There was a error creating a URL for this request.")
+		return nil, err
+	}
+
+	urlBuilder.RawQuery = params.Encode()
+
+	request, err := http.NewRequest("GET", urlBuilder.String(), nil)
 
 	if err == nil && *token != "" {
 		request.Header.Set("Authorization", *token)
