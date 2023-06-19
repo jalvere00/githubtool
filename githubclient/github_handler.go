@@ -2,6 +2,7 @@ package githubclient
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -21,8 +22,7 @@ type Release struct {
 	Date    string `json:"created_at"`
 }
 
-// Todo(jaalvere00): Rename struct
-type PullRequest struct {
+type Pull struct {
 	Title  string `json:"title"`
 	Number int    `json:"number"`
 	State  string `json:"state"`
@@ -37,7 +37,6 @@ func GetRepoRelease(user, repository string) ([]Release, error) {
 
 	response, err := makeGetRequest(user, repository, "releases")
 	if err != nil {
-		fmt.Println("Error making response: ", err)
 		return nil, err
 	}
 
@@ -45,19 +44,17 @@ func GetRepoRelease(user, repository string) ([]Release, error) {
 
 	err = json.NewDecoder(response.Body).Decode(&releases)
 	if err != nil {
-		fmt.Println("Error decoding JSON response: ", err)
 		return nil, err
 	}
 
 	return releases, nil
 }
 
-func GetRepoPull(user, repository string) ([]PullRequest, error) {
-	var pull []PullRequest
+func GetRepoPull(user, repository string) ([]Pull, error) {
+	var pull []Pull
 
 	response, err := makeGetRequest(user, repository, "pulls")
 	if err != nil {
-		fmt.Println("Error making response: ", err)
 		return nil, err
 	}
 
@@ -65,7 +62,6 @@ func GetRepoPull(user, repository string) ([]PullRequest, error) {
 
 	err = json.NewDecoder(response.Body).Decode(&pull)
 	if err != nil {
-		fmt.Println("Error decoding JSON response: ", err)
 		return nil, err
 	}
 
@@ -77,13 +73,23 @@ func makeGetRequest(user, repository, api string) (*http.Response, error) {
 
 	request, err := createGetRequest(user, repository, api)
 	if err != nil {
-		fmt.Println("Error creating request: ", err)
 		return nil, err
 	}
-
-	// ToDo(jaalvere00): check status code.
 	response, err := client.Do(request)
+
+	if valid, err := checkResponse(response); !valid {
+		return nil, err
+	}
 	return response, err
+}
+
+func checkResponse(response *http.Response) (bool, error) {
+	if response.StatusCode == 404 {
+		return false, errors.New("resource not found, check your username an repository name and try again")
+	} else if response.StatusCode != 200 {
+		return false, errors.New("unknown error occured while making request to githubs API")
+	}
+	return true, nil
 }
 
 func createGetRequest(user, repository, api string) (*http.Request, error) {
