@@ -34,7 +34,7 @@ func main() {
 		}
 		fmt.Println("Here are the most recent releases")
 		for _, r := range releases {
-			fmt.Printf("Name:%s\nCreate Time:%s\n\n", r.Name, r.Date)
+			fmt.Printf("Tag Name: %s\nCreate Time: %s\n\n", r.TagName, r.Date)
 		}
 	} else if argsWithProg[0] == PullCMD {
 		pulls, err := githubclient.GetRepoPull(argsWithProg[1], argsWithProg[2])
@@ -44,7 +44,7 @@ func main() {
 		}
 		fmt.Println("Here are the most recent pull request")
 		for _, p := range pulls {
-			fmt.Printf("Title:%s\nNumber:%d\nState:%s\n\n", p.Title, p.Number, p.State)
+			fmt.Printf("Title: %s\nNumber: %d\nState: %s\n\n", p.Title, p.Number, p.State)
 		}
 	} else {
 		fmt.Fprintf(os.Stderr, "Error: %s is not a command.\n", argsWithProg[0])
