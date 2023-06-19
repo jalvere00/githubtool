@@ -15,6 +15,9 @@ go get github.com/jalvere00/githubtool
 
 # Compile and install package
 go install -v github.com/jalvere00/GitHubTool
+
+# Set execute path in alias
+alias githubtool=~/go/bin/githubtool
 ```
 
 
