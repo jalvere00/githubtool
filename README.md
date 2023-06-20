@@ -5,6 +5,14 @@ A tool for viewing the most recent pull request and release versions of a GitHub
 ## Installing
 Requires [Go][def]
 
+### From File
+1. Download and unzip attached the file.
+2. CD into the unzip directory which contain the `main.go` file.
+3. Create executable `go build main.go`. The executable's name will end with `.exe` if build on windows. 
+4. Set alias for the excutable `alias githubtool=.\[main || main.exe]`.
+
+And your all set.
+
 ### Linux
 More information on setting up your go environment can be found at [link](https://www.geeksforgeeks.org/how-to-install-a-package-with-go-get/)
 
